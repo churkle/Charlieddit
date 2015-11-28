@@ -123,4 +123,13 @@ router.put('/posts/:post/comments/:comment/upvote', function(req, res, next){
 	});
 });
 
+router.delete('/posts/:post/comments/:comment', function(req, res, next){
+	req.comment.remove(function(err){
+		if(err)
+		{
+			return next(err);
+		}
+	})
+})
+
 module.exports = router;

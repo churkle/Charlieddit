@@ -78,6 +78,7 @@
           <span style="font-size:20px; margin-left:10px">
             {{ comment.body }}
           </span>
+          <button type="button" class="btn btn-danger btn-xs" ng-click="delete(comment, $index)">Delete</button>
         </div>
 
         <form ng-submit="addComment()" style="margin-top:30px;">
