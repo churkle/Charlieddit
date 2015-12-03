@@ -131,6 +131,14 @@ router.put('/posts/:post/comments/:comment/upvote', function(req, res, next){
 	});
 });
 
+router.put('/posts/:post/comments/:comment/downvote', function(req, res, next){
+	req.comment.downvote(function(err, comment){
+		if(err) { return next(err); }
+
+		res.json(comment);
+	})
+});
+
 router.delete('/posts/:post/comments/:comment', function(req, res, next){
 	req.comment.remove(function(err){
 		if(err)

@@ -81,6 +81,9 @@ app.controller('PostsCtrl', [
 		$scope.incrementUpvotes = function(comment){
 			posts.upvoteComment(post, comment);
 		};
+		$scope.decrementUpvotes = function(comment){
+			posts.downvoteComment(post, comment);
+		};
 		$scope.delete = function(comment, index){
 			var r = confirm("Are you sure you want to delete this comment?");
 
@@ -128,6 +131,12 @@ app.factory('posts', ['$http', function($http){
 	o.upvoteComment = function(post, comment){
 		return $http.put('/posts/' + post._id + '/comments/' + comment._id + '/upvote').success(function(data){
 			comment.upvotes += 1;
+		});
+	};
+
+	o.downvoteComment = function(post, comment){
+		return $http.put('/posts/' + post._id + '/comments/' + comment._id + '/downvote').success(function(data){
+			comment.upvotes -= 1;
 		});
 	};
 

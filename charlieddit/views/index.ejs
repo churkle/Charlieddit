@@ -65,6 +65,11 @@
 
       <script type="text/ng-template" id="/posts.html">
         <div class="page-header">
+          
+          <a href="#/home">
+            <span class="glyphicon glyphicon-arrow-left">
+          </a>
+          
           <h3>
             <a ng-show="post.link" href="{{post.link}}">
               {{post.title}}
@@ -75,14 +80,20 @@
           </h3>
         </div>
 
-        <div ng-repeat="comment in post.comments | orderBy: '-upvotes'">
+        <div ng-repeat="comment in post.comments | orderBy: '-upvotes'" style="margin-top:20px">
           <span class="glyphicon glyphicon-thumbs-up" ng-click="incrementUpvotes(comment)"></span>
-          {{ comment.upvotes }} - by {{ comment.author }}
-          <span style="font-size:20px; margin-left:10px">
+          <br>
+          <span style="font-size:10px;">
+            {{ comment.upvotes }} - by {{ comment.author }}
+          </span>
+          <span style="font-size:12px; margin-left:10px">
             {{ comment.body }}
           </span>
           <button type="button" class="btn btn-danger btn-xs" ng-click="delete(comment, $index)"><span class="glyphicon glyphicon-trash"></span>
           Delete</button>
+          <br>
+
+          <span class="glyphicon glyphicon-thumbs-down" ng-click="decrementUpvotes(comment)"></span>
         </div>
 
         <form ng-submit="addComment()" style="margin-top:30px;">

@@ -10,6 +10,11 @@ var commentSchema = new mongoose.Schema({
 commentSchema.methods.upvote = function(cb){
 	this.upvotes += 1;
 	this.save(cb);
-}
+};
+
+commentSchema.methods.downvote = function(cb){
+	this.upvotes -= 1;
+	this.save(cb);
+};
 
 mongoose.model('Comment', commentSchema);
