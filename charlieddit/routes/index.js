@@ -112,6 +112,14 @@ router.put('/posts/:post/upvote', function(req, res, next){
 	});
 });
 
+router.put('/posts/:post/downvote', function(req, res, next){
+	req.post.downvote(function(err, post){
+		if (err) { return next(err); }
+
+		res.json(post);
+	});
+});
+
 router.put('/posts/:post/comments/:comment/upvote', function(req, res, next){
 	req.comment.upvote(function(err, comment){
 		if(err)
@@ -129,7 +137,7 @@ router.delete('/posts/:post/comments/:comment', function(req, res, next){
 		{
 			return next(err);
 		}
-	})
-})
+	});
+});
 
 module.exports = router;

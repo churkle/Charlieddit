@@ -52,6 +52,9 @@ app.controller('MainCtrl', [
 		$scope.incrementUpvotes = function(post){
 			posts.upvote(post);
 		};
+		$scope.decrementUpvotes = function(post){
+			posts.downvote(post);
+		};
 	}]);
 
 app.controller('PostsCtrl', [
@@ -73,14 +76,19 @@ app.controller('PostsCtrl', [
 			}).success(function(data){
 				post.comments.push(data);
 			});
-			scope.body = '';
+			$scope.body = '';
 		};
 		$scope.incrementUpvotes = function(comment){
 			posts.upvoteComment(post, comment);
 		};
 		$scope.delete = function(comment, index){
-			posts.deleteComment(post, comment);
-			post.comments.splice(index, 1);
+			var r = confirm("Are you sure you want to delete this comment?");
+
+			if(r == true)
+			{
+				posts.deleteComment(post, comment);
+				post.comments.splice(index, 1);
+			}
 		};
 }]);
 
@@ -110,6 +118,12 @@ app.factory('posts', ['$http', function($http){
 			post.upvotes += 1;
 		});
 	};
+
+	o.downvote = function(post){
+		return $http.put('/posts/' + post._id + '/downvote').success(function(data){
+			post.upvotes -= 1;
+		})
+	}
 
 	o.upvoteComment = function(post, comment){
 		return $http.put('/posts/' + post._id + '/comments/' + comment._id + '/upvote').success(function(data){
