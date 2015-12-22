@@ -20,6 +20,17 @@ router.get('/posts', function(req, res, next){
 	});
 });
 
+router.get('/posts/:post/comments', function(req, res, next){
+	req.post.populate('comments', function(err, post){
+		if(err)
+		{
+			return next(err);
+		}
+
+		res.json(post.comments);
+	});
+});
+
 router.post('/posts', function(req, res, next){
 	var post = new Post(req.body);
 
@@ -101,7 +112,7 @@ router.get('/posts/:post', function(req, res){
 		}
 
 		res.json(post);
-	})
+	});
 });
 
 router.put('/posts/:post/upvote', function(req, res, next){
@@ -140,11 +151,16 @@ router.put('/posts/:post/comments/:comment/downvote', function(req, res, next){
 });
 
 router.delete('/posts/:post/comments/:comment', function(req, res, next){
+	//Need to delete comment from post array, then in the frontend, refresh #comments
+	var index = req.post.comments.indexOf(req.comment);
+	req.post.comments.splice(index, 1);
 	req.comment.remove(function(err){
 		if(err)
 		{
 			return next(err);
 		}
+
+		req.post.save();
 	});
 });
 

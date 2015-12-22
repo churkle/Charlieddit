@@ -55,6 +55,9 @@ app.controller('MainCtrl', [
 		$scope.decrementUpvotes = function(post){
 			posts.downvote(post);
 		};
+		$scope.getNumComments = function(post){
+			return posts.getNumComments(post);
+		};
 	}]);
 
 app.controller('PostsCtrl', [
@@ -84,12 +87,16 @@ app.controller('PostsCtrl', [
 		$scope.decrementUpvotes = function(comment){
 			posts.downvoteComment(post, comment);
 		};
+		$scope.getNumComments = function(){
+			return posts.getNumComments(post);
+		}
 		$scope.delete = function(comment, index){
 			var r = confirm("Are you sure you want to delete this comment?");
 
 			if(r == true)
 			{
 				posts.deleteComment(post, comment);
+				var index = post.comments.indexOf(comment);
 				post.comments.splice(index, 1);
 			}
 		};
@@ -125,8 +132,8 @@ app.factory('posts', ['$http', function($http){
 	o.downvote = function(post){
 		return $http.put('/posts/' + post._id + '/downvote').success(function(data){
 			post.upvotes -= 1;
-		})
-	}
+		});
+	};
 
 	o.upvoteComment = function(post, comment){
 		return $http.put('/posts/' + post._id + '/comments/' + comment._id + '/upvote').success(function(data){
@@ -148,6 +155,10 @@ app.factory('posts', ['$http', function($http){
 
 	o.deleteComment = function(post, comment){
 		return $http.delete('/posts/' + post._id + '/comments/' + comment._id);
+	};
+
+	o.getNumComments = function(post){
+		return post.comments.length;
 	};
 
 	return o;
