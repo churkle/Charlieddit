@@ -6,7 +6,7 @@ var mongoose = require('mongoose');
 var Post = mongoose.model('Post');
 var Comment = mongoose.model('Comment');
 var User = mongoose.model('User');
-var auth = jwt({ secret: 'PSDBSSEVENTY', userProperty: 'payload' });
+var auth = jwt({ secret: 'PWBS70', userProperty: 'payload' });
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -128,8 +128,8 @@ router.param('comment', function(req, res, next, id){
 
 		req.comment = comment;
 		return next();
-	})
-})
+	});
+});
 
 router.post('/posts/:post/comments', auth, function(req, res, next){
 	var comment = new Comment(req.body);
@@ -197,7 +197,7 @@ router.put('/posts/:post/comments/:comment/downvote', auth, function(req, res, n
 		if(err) { return next(err); }
 
 		res.json(comment);
-	})
+	});
 });
 
 router.delete('/posts/:post/comments/:comment', function(req, res, next){

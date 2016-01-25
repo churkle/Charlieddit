@@ -58,9 +58,12 @@ app.config([
 app.controller('MainCtrl', [
 	'$scope',
 	'posts',
-	function($scope, posts){
+	'auth',
+	function($scope, posts, auth){
 		$scope.test = 'Hello world!';
 		$scope.posts = posts.posts;
+		$scope.isLoggedIn = auth.isLoggedIn;
+
 		$scope.addPost = function(myTitle){
 			if($scope.title && $scope.title !== '')
 			{
@@ -88,8 +91,10 @@ app.controller('PostsCtrl', [
 	'$scope',
 	'posts',
 	'post',
-	function($scope, posts, post) {
+	'auth',
+	function($scope, posts, post, auth) {
 		$scope.post = post;
+		$scope.isLoggedIn = auth.isLoggedIn;
 		$scope.addComment = function() {
 			if($scope.body === '')
 			{
@@ -113,11 +118,11 @@ app.controller('PostsCtrl', [
 		};
 		$scope.getNumComments = function(){
 			return posts.getNumComments(post);
-		}
-		$scope.delete = function(comment, index){
+		};
+		$scope.delete = function(comment){
 			var r = confirm("Are you sure you want to delete this comment?");
 
-			if(r == true)
+			if(r === true)
 			{
 				posts.deleteComment(post, comment);
 				var index = post.comments.indexOf(comment);
@@ -126,7 +131,7 @@ app.controller('PostsCtrl', [
 		};
 }]);
 
-app.factory('posts', ['$http', function($http){
+app.factory('posts', ['$http', 'auth', function($http, auth){
 	var o = {
 		posts: []
 	};
@@ -138,35 +143,47 @@ app.factory('posts', ['$http', function($http){
 	};
 
 	o.create = function(post){
-		return $http.post('/posts', post).success(function(data){
+		return $http.post('/posts', post, {
+			headers: {Authorization: 'Bearer '+auth.getToken()}
+		}).success(function(data){
 			o.posts.push(data);
 		});
 	};
 
 	o.addComment = function(id, comment){
-		return $http.post('/posts/' + id +'/comments', comment);
+		return $http.post('/posts/' + id +'/comments', comment, {
+			headers: {Authorization: 'Bearer '+auth.getToken()}
+		});
 	};
 
 	o.upvote = function(post){
-		return $http.put('/posts/' + post._id + '/upvote').success(function(data){
+		return $http.put('/posts/' + post._id + '/upvote', null, {
+			headers: {Authorization: 'Bearer '+auth.getToken()}
+		}).success(function(data){
 			post.upvotes += 1;
 		});
 	};
 
 	o.downvote = function(post){
-		return $http.put('/posts/' + post._id + '/downvote').success(function(data){
+		return $http.put('/posts/' + post._id + '/downvote', {
+			headers: {Authorization: 'Bearer '+auth.getToken()}
+		}).success(function(data){
 			post.upvotes -= 1;
 		});
 	};
 
 	o.upvoteComment = function(post, comment){
-		return $http.put('/posts/' + post._id + '/comments/' + comment._id + '/upvote').success(function(data){
+		return $http.put('/posts/' + post._id + '/comments/' + comment._id + '/upvote', {
+			headers: {Authorization: 'Bearer '+auth.getToken()}
+		}).success(function(data){
 			comment.upvotes += 1;
 		});
 	};
 
 	o.downvoteComment = function(post, comment){
-		return $http.put('/posts/' + post._id + '/comments/' + comment._id + '/downvote').success(function(data){
+		return $http.put('/posts/' + post._id + '/comments/' + comment._id + '/downvote', {
+			headers: {Authorization: 'Bearer '+auth.getToken()}
+		}).success(function(data){
 			comment.upvotes -= 1;
 		});
 	};
@@ -178,7 +195,9 @@ app.factory('posts', ['$http', function($http){
 	};
 
 	o.deleteComment = function(post, comment){
-		return $http.delete('/posts/' + post._id + '/comments/' + comment._id);
+		return $http.delete('/posts/' + post._id + '/comments/' + comment._id, {
+			headers: {Authorization: 'Bearer '+auth.getToken()}
+		});
 	};
 
 	o.getNumComments = function(post){
@@ -188,7 +207,7 @@ app.factory('posts', ['$http', function($http){
 	return o;
 }]);
 
-.controller('AuthCtrl', [
+app.controller('AuthCtrl', [
 	'$scope',
 	'$state',
 	'auth', 
@@ -212,7 +231,7 @@ app.factory('posts', ['$http', function($http){
 		};
 	}])
 
-.factory('auth', ['$http', '$window', function($http, $window){
+app.factory('auth', ['$http', '$window', function($http, $window){
 	var auth = {};
 
 	auth.saveToken = function(token){
@@ -259,3 +278,12 @@ app.factory('posts', ['$http', function($http){
 
 	return auth;
 }]);
+
+app.controller('NavCtrl', [
+	'$scope',
+	'auth',
+	function($scope, auth){
+		$scope.isLoggedIn = auth.isLoggedIn;
+		$scope.currentUser = auth.currentUser;
+		$scope.logOut = auth.logOut;
+	}]);
